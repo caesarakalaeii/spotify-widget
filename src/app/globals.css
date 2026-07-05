@@ -297,7 +297,7 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    left: 0.084em;
+    left: 0.11em;
     right: 0.179em;
     height: 0.016em;
     border-radius: 0.01em;
@@ -319,29 +319,30 @@
     top: 50%;
     left: 0;
     transform: translateY(-50%);
+    /* The whole headshell assembly runs ALONG the arm (a continuation of the tube):
+       stylus tip → cartridge → headshell body → tube. */
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
   }
-  .ta__head-body {
-    width: 0.063em;
-    height: 0.047em;
-    border-radius: 0.01em;
-    background: linear-gradient(180deg, #3c3c44, #26262c);
+  .ta__sty {
+    width: 0.016em;
+    height: 0.012em;
+    border-radius: 0.004em;
+    background: #ddd;
   }
   .ta__cart {
-    /* Elongated block so the cartridge reads as oriented along the arm. */
-    width: 0.03em;
-    height: 0.055em;
+    width: 0.05em;
+    height: 0.03em;
     border-radius: 0.006em;
-    margin-top: 0.005em;
+    margin: 0 0.003em;
     background: var(--accent, #1db954);
   }
-  .ta__sty {
-    width: 0.011em;
-    height: 0.026em;
-    margin-top: 0.005em;
-    background: #ddd;
+  .ta__head-body {
+    width: 0.042em;
+    height: 0.05em;
+    border-radius: 0.01em;
+    background: linear-gradient(90deg, #3c3c44, #26262c);
   }
 
   .marquee {

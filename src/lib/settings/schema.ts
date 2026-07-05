@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { FONT_KEYS } from '@/lib/widget/fonts'
 
 /**
  * Widget configuration. This schema is the single source of truth: the settings
@@ -38,7 +39,7 @@ export const SettingsSchema = z
         showTitle: z.boolean().default(true),
         showArtist: z.boolean().default(true),
         showAlbum: z.boolean().default(false),
-        font: z.enum(['barlow', 'dm-mono']).default('barlow'),
+        font: z.enum(FONT_KEYS).default('barlow'),
         titleSize: z.number().min(10).max(64).default(22),
         artistSize: z.number().min(8).max(48).default(16),
         marquee: z.boolean().default(true),

@@ -3,6 +3,7 @@
 import type { CSSProperties } from 'react'
 import { cn } from '@/lib/utils'
 import { shouldMarquee } from '@/lib/widget/spin'
+import { fontFamily } from '@/lib/widget/fonts'
 import type { WidgetSettings } from '@/lib/settings/schema'
 
 export function TrackText({
@@ -20,14 +21,13 @@ export function TrackText({
   colors: WidgetSettings['colors']
   reducedMotion: boolean
 }) {
-  const fontClass = text.font === 'dm-mono' ? 'font-mono' : 'font-sans'
   const marquee = text.marquee && shouldMarquee(title, text.marqueeThreshold) && !reducedMotion
   const artistLine = artists.join(', ')
 
   return (
     <div
-      className={cn('flex min-w-0 flex-col justify-center gap-0.5', fontClass)}
-      style={{ textAlign: text.align }}
+      className={cn('flex min-w-0 flex-col justify-center gap-0.5')}
+      style={{ textAlign: text.align, fontFamily: fontFamily(text.font) }}
       data-testid="track-text"
     >
       {text.showTitle && (

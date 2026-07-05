@@ -81,10 +81,11 @@ function Tonearm({ deg, parked }: { deg: number; parked: boolean }) {
       >
         <div className="ta__cw" />
         <div className="ta__tube" />
+        {/* Head runs along the arm: stylus tip (record side) → cartridge → headshell body. */}
         <div className="ta__head">
-          <div className="ta__head-body" />
-          <div className="ta__cart" />
           <div className="ta__sty" />
+          <div className="ta__cart" />
+          <div className="ta__head-body" />
         </div>
       </div>
       <div className="ta__cap" aria-hidden />

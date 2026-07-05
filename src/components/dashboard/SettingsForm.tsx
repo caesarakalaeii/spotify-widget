@@ -5,7 +5,10 @@ import { Slider } from '@/components/ui/Slider'
 import { Toggle } from '@/components/ui/Toggle'
 import { Select } from '@/components/ui/Select'
 import { ColorPicker } from '@/components/ui/ColorPicker'
+import { FONTS } from '@/lib/widget/fonts'
 import type { WidgetSettings } from '@/lib/settings/schema'
+
+const FONT_OPTIONS = Object.entries(FONTS).map(([value, { label }]) => ({ value, label }))
 
 type Group = 'layout' | 'vinyl' | 'text' | 'colors' | 'progress' | 'behaviour' | 'attribution'
 export type SettingsPatch = { [K in Group]?: Partial<WidgetSettings[K]> }
@@ -136,10 +139,7 @@ export function SettingsForm({
           label="Font"
           value={s.text.font}
           onChange={(v) => onPatch({ text: { font: v as WidgetSettings['text']['font'] } })}
-          options={[
-            { label: 'Barlow', value: 'barlow' },
-            { label: 'DM Mono', value: 'dm-mono' },
-          ]}
+          options={FONT_OPTIONS}
         />
         <Slider
           label="Title size"
