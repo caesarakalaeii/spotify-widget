@@ -110,6 +110,9 @@ Manifests live in `caesar-deployment/apps/workloads/spotify-widget/`.
 
 ## Licence / attribution
 
+Licensed under the **GNU Affero General Public License v3.0 or later** (AGPL-3.0-or-later) —
+see [`LICENSE`](LICENSE).
+
 Album art, track and artist names are provided by **Spotify**. This is an unofficial tool and is
 not affiliated with or endorsed by Spotify. Content is shown transiently and never cached beyond
 immediate use, per the [Spotify Developer Terms](https://developer.spotify.com/terms).

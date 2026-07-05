@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Spotify now-playing vinyl widget for streamers (spotify.caes.ar)",
+  "license": "AGPL-3.0-or-later",
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",

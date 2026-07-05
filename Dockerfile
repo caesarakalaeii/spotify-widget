@@ -37,6 +37,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --chown=nextjs:nodejs migrations ./migrations
 COPY --chown=nextjs:nodejs scripts ./scripts
 COPY --chown=nextjs:nodejs docker-entrypoint.sh ./docker-entrypoint.sh
+COPY --chown=nextjs:nodejs LICENSE ./LICENSE
 RUN chmod +x ./docker-entrypoint.sh
 
 USER nextjs
