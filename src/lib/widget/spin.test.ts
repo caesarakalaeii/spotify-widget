@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   revDurationSec,
   spinStateFor,
+  tonearmStateFor,
   shouldMarquee,
   interpolateProgress,
   formatTime,
@@ -18,6 +19,13 @@ describe('spin helpers', () => {
     expect(spinStateFor(false, false)).toBe('spinning-down')
     expect(spinStateFor(true, true)).toBe('stopped')
     expect(spinStateFor(false, true)).toBe('stopped')
+  })
+
+  it('positions the tonearm like a real turntable', () => {
+    expect(tonearmStateFor(true, false)).toBe('playing') // track playing → on the record
+    expect(tonearmStateFor(false, false)).toBe('cued') // paused → lifted off the groove
+    expect(tonearmStateFor(false, true)).toBe('rest') // nothing playing → parked
+    expect(tonearmStateFor(true, true)).toBe('rest') // idle wins
   })
 
   it('flags long titles for marquee', () => {

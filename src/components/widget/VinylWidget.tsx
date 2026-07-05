@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react'
 import { cn } from '@/lib/utils'
-import { spinStateFor } from '@/lib/widget/spin'
+import { spinStateFor, tonearmStateFor } from '@/lib/widget/spin'
 import type { WidgetSettings } from '@/lib/settings/schema'
 import type { NowPlaying } from '@/types/nowplaying'
 import { VinylDisc } from './VinylDisc'
@@ -36,6 +36,7 @@ export function VinylWidget({
   const isPlaying = playback?.isPlaying ?? false
   const idle = !track
   const spin = idle ? 'stopped' : spinStateFor(isPlaying, reducedMotion)
+  const tonearmState = tonearmStateFor(isPlaying, idle)
 
   const showDisc = layout.orientation !== 'text-only'
   const showText = layout.orientation !== 'disc-only'
@@ -62,7 +63,7 @@ export function VinylWidget({
       {showDisc && (
         <VinylDisc
           spin={spin}
-          engaged={isPlaying && !idle}
+          tonearmState={tonearmState}
           albumArtUrl={track?.albumArtUrl ?? null}
           title={track?.name ?? behaviour.idleText}
           size={layout.size}

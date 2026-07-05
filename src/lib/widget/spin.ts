@@ -16,6 +16,19 @@ export function spinStateFor(isPlaying: boolean, reducedMotion: boolean): SpinSt
   return isPlaying ? 'spinning' : 'spinning-down'
 }
 
+export type TonearmState = 'playing' | 'cued' | 'rest'
+
+/**
+ * Where the tonearm sits, like a real turntable:
+ * - playing → stylus down on the record
+ * - cued    → lifted just off the groove (paused)
+ * - rest    → swung back to its rest, off the record (nothing playing)
+ */
+export function tonearmStateFor(isPlaying: boolean, idle: boolean): TonearmState {
+  if (idle) return 'rest'
+  return isPlaying ? 'playing' : 'cued'
+}
+
 /** Whether a title needs a scrolling marquee. */
 export function shouldMarquee(text: string, maxChars: number): boolean {
   return text.length > maxChars

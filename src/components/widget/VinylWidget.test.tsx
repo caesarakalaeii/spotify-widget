@@ -22,9 +22,10 @@ function playing(overrides: Partial<NowPlaying['track']> = {}): NowPlaying {
 }
 
 describe('VinylWidget', () => {
-  it('spins while a track is playing and shows attribution', () => {
+  it('spins and rests the tonearm on the record while playing, with attribution', () => {
     render(<VinylWidget settings={DEFAULT_SETTINGS} playback={playing()} />)
     expect(screen.getByTestId('vinyl-disc')).toHaveAttribute('data-spin', 'spinning')
+    expect(screen.getByTestId('tonearm')).toHaveAttribute('data-position', 'playing')
     expect(screen.getByText('Song Title')).toBeInTheDocument()
     expect(screen.getByTestId('spotify-attribution')).toHaveAttribute(
       'href',
@@ -32,16 +33,24 @@ describe('VinylWidget', () => {
     )
   })
 
-  it('spins down when paused', () => {
+  it('spins down and cues (lifts) the tonearm when paused', () => {
     render(<VinylWidget settings={DEFAULT_SETTINGS} playback={{ ...playing(), isPlaying: false }} />)
     expect(screen.getByTestId('vinyl-disc')).toHaveAttribute('data-spin', 'spinning-down')
+    expect(screen.getByTestId('tonearm')).toHaveAttribute('data-position', 'cued')
   })
 
-  it('shows a stopped disc and the idle label when nothing is playing', () => {
+  it('shows a stopped disc, parks the tonearm, and shows the idle label when nothing is playing', () => {
     render(<VinylWidget settings={DEFAULT_SETTINGS} playback={null} />)
     expect(screen.getByTestId('vinyl-widget')).toHaveAttribute('data-idle', 'true')
     expect(screen.getByTestId('vinyl-disc')).toHaveAttribute('data-spin', 'stopped')
+    expect(screen.getByTestId('tonearm')).toHaveAttribute('data-position', 'rest')
     expect(screen.getByTestId('idle-label')).toHaveTextContent('Not playing')
+  })
+
+  it('hides the tonearm when the setting is off', () => {
+    const settings = parseSettings({ vinyl: { tonearm: false } })
+    render(<VinylWidget settings={settings} playback={playing()} />)
+    expect(screen.queryByTestId('tonearm')).toBeNull()
   })
 
   it('honours reduced motion by stopping the disc even while playing', () => {
