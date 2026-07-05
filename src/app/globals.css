@@ -194,8 +194,8 @@
     z-index: 1;
   }
   .vinyl__art--label {
-    width: 38%;
-    height: 38%;
+    width: 32%;
+    height: 32%;
     border-radius: var(--radius-full);
     box-shadow:
       0 0 0 2px rgba(0, 0, 0, 0.6),
@@ -215,8 +215,8 @@
     position: absolute;
     inset: 0;
     margin: auto;
-    width: 38%;
-    height: 38%;
+    width: 32%;
+    height: 32%;
     border-radius: var(--radius-full);
     background: radial-gradient(circle, #2a2a30, #141418);
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.6);
@@ -226,38 +226,31 @@
     position: absolute;
     inset: 0;
     margin: auto;
-    width: 3.5%;
-    height: 3.5%;
+    width: 2.2%;
+    height: 2.2%;
     border-radius: var(--radius-full);
     background: radial-gradient(circle, #444, #000);
     box-shadow: inset 0 0 3px #000;
     z-index: 2;
   }
 
-  /* Tonearm: pivots from a base in the top-right corner (off the platter).
-     It rests on the record when playing, lifts toward the rim when cued
-     (paused), and swings back off the record at rest (idle). The SVG spans the
-     whole disc box so its coordinates line up with the record. */
+  /* Tonearm: pivots from a fixed base in the top-right corner (off the platter).
+     Its rotation is set inline from playback progress (see tonearmRotationDeg):
+     parked off the record when idle, tracking inward as the track plays. The SVG
+     spans the whole disc box so its coordinates line up with the record. The eased
+     transition makes big swings (cue-in, track change, return-to-rest) feel
+     mechanical, while the slow per-second progress drift stays imperceptibly smooth. */
   .tonearm {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     overflow: visible;
-    transform-origin: 88% 11%; /* the pivot */
-    transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform-origin: 88% 13%; /* the pivot */
+    transition: transform 0.9s cubic-bezier(0.25, 0.1, 0.25, 1);
     z-index: 3;
     pointer-events: none;
     filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
-  }
-  .tonearm[data-position='playing'] {
-    transform: rotate(0deg);
-  }
-  .tonearm[data-position='cued'] {
-    transform: rotate(7deg);
-  }
-  .tonearm[data-position='rest'] {
-    transform: rotate(22deg);
   }
 
   .marquee {

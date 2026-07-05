@@ -4,6 +4,11 @@ import { VinylWidget } from './VinylWidget'
 import { DEFAULT_SETTINGS, parseSettings } from '@/lib/settings/schema'
 import type { NowPlaying } from '@/types/nowplaying'
 
+function rotateDeg(el: HTMLElement): number {
+  const m = el.style.transform.match(/rotate\(([-\d.]+)deg\)/)
+  return m ? parseFloat(m[1]!) : NaN
+}
+
 function playing(overrides: Partial<NowPlaying['track']> = {}): NowPlaying {
   return {
     isPlaying: true,
@@ -22,10 +27,12 @@ function playing(overrides: Partial<NowPlaying['track']> = {}): NowPlaying {
 }
 
 describe('VinylWidget', () => {
-  it('spins and rests the tonearm on the record while playing, with attribution', () => {
+  it('spins and lands the tonearm on the record while playing, with attribution', () => {
     render(<VinylWidget settings={DEFAULT_SETTINGS} playback={playing()} />)
     expect(screen.getByTestId('vinyl-disc')).toHaveAttribute('data-spin', 'spinning')
-    expect(screen.getByTestId('tonearm')).toHaveAttribute('data-position', 'playing')
+    const arm = screen.getByTestId('tonearm')
+    expect(arm).toHaveAttribute('data-parked', 'false') // on the record
+    expect(arm.style.transform).toMatch(/rotate\(/)
     expect(screen.getByText('Song Title')).toBeInTheDocument()
     expect(screen.getByTestId('spotify-attribution')).toHaveAttribute(
       'href',
@@ -33,17 +40,29 @@ describe('VinylWidget', () => {
     )
   })
 
-  it('spins down and cues (lifts) the tonearm when paused', () => {
+  it('tracks further inward at higher progress', () => {
+    const early = render(
+      <VinylWidget settings={DEFAULT_SETTINGS} playback={playing({ progressMs: 2000 })} />,
+    )
+    const earlyDeg = rotateDeg(early.getByTestId('tonearm'))
+    early.unmount()
+    const late = render(
+      <VinylWidget settings={DEFAULT_SETTINGS} playback={playing({ progressMs: 190000 })} />,
+    )
+    expect(rotateDeg(late.getByTestId('tonearm'))).toBeGreaterThan(earlyDeg)
+  })
+
+  it('spins down when paused (tonearm stays on the record, not parked)', () => {
     render(<VinylWidget settings={DEFAULT_SETTINGS} playback={{ ...playing(), isPlaying: false }} />)
     expect(screen.getByTestId('vinyl-disc')).toHaveAttribute('data-spin', 'spinning-down')
-    expect(screen.getByTestId('tonearm')).toHaveAttribute('data-position', 'cued')
+    expect(screen.getByTestId('tonearm')).toHaveAttribute('data-parked', 'false')
   })
 
   it('shows a stopped disc, parks the tonearm, and shows the idle label when nothing is playing', () => {
     render(<VinylWidget settings={DEFAULT_SETTINGS} playback={null} />)
     expect(screen.getByTestId('vinyl-widget')).toHaveAttribute('data-idle', 'true')
     expect(screen.getByTestId('vinyl-disc')).toHaveAttribute('data-spin', 'stopped')
-    expect(screen.getByTestId('tonearm')).toHaveAttribute('data-position', 'rest')
+    expect(screen.getByTestId('tonearm')).toHaveAttribute('data-parked', 'true')
     expect(screen.getByTestId('idle-label')).toHaveTextContent('Not playing')
   })
 

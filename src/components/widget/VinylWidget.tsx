@@ -1,8 +1,13 @@
 'use client'
 
-import type { CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { cn } from '@/lib/utils'
-import { spinStateFor, tonearmStateFor } from '@/lib/widget/spin'
+import {
+  spinStateFor,
+  tonearmRotationDeg,
+  progressFraction,
+  interpolateProgress,
+} from '@/lib/widget/spin'
 import type { WidgetSettings } from '@/lib/settings/schema'
 import type { NowPlaying } from '@/types/nowplaying'
 import { VinylDisc } from './VinylDisc'
@@ -36,7 +41,20 @@ export function VinylWidget({
   const isPlaying = playback?.isPlaying ?? false
   const idle = !track
   const spin = idle ? 'stopped' : spinStateFor(isPlaying, reducedMotion)
-  const tonearmState = tonearmStateFor(isPlaying, idle)
+
+  // Live progress ticker so the tonearm drifts inward while playing (frozen when paused).
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    if (!isPlaying) return
+    const id = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [isPlaying])
+
+  const elapsedMs = track
+    ? interpolateProgress(track.progressMs, playback?.fetchedAt ?? now, isPlaying, track.durationMs, now)
+    : 0
+  const fraction = track ? progressFraction(elapsedMs, track.durationMs) : 0
+  const tonearmDeg = tonearmRotationDeg(idle, fraction)
 
   const showDisc = layout.orientation !== 'text-only'
   const showText = layout.orientation !== 'disc-only'
@@ -63,7 +81,8 @@ export function VinylWidget({
       {showDisc && (
         <VinylDisc
           spin={spin}
-          tonearmState={tonearmState}
+          tonearmDeg={tonearmDeg}
+          tonearmParked={idle}
           albumArtUrl={track?.albumArtUrl ?? null}
           title={track?.name ?? behaviour.idleText}
           size={layout.size}

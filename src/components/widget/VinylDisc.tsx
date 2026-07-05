@@ -1,12 +1,13 @@
 'use client'
 
 import type { CSSProperties } from 'react'
-import { revDurationSec, type SpinState, type TonearmState } from '@/lib/widget/spin'
+import { revDurationSec, type SpinState } from '@/lib/widget/spin'
 
 export interface VinylDiscProps {
   spin: SpinState
-  /** Where the tonearm sits: on the record (playing), lifted (cued), or parked (rest). */
-  tonearmState: TonearmState
+  /** Tonearm rotation in degrees (from tonearmRotationDeg) and whether it is parked (idle). */
+  tonearmDeg: number
+  tonearmParked: boolean
   albumArtUrl: string | null
   title: string
   size: number
@@ -54,56 +55,57 @@ export function VinylDisc(props: VinylDiscProps) {
         )}
         <div className="vinyl__spindle" aria-hidden />
       </div>
-      {props.tonearm && <Tonearm state={props.tonearmState} />}
+      {props.tonearm && (
+        <Tonearm deg={props.tonearmDeg} parked={props.tonearmParked} accent={props.accent} />
+      )}
     </div>
   )
 }
 
 /**
- * A record-player tonearm: gimbal pivot + counterweight in the top-right corner,
- * a tube reaching down onto the record, and an angled headshell with a stylus.
- * Its position (playing / cued / rest) is animated via the `.tonearm` CSS.
+ * A record-player tonearm: a bulky gimbal pivot + counterweight barrel anchored in
+ * the top-right corner (off the platter), a long slender tube crossing the record,
+ * and an angled headshell + cartridge with a stylus. Drawn in the 0%-progress
+ * reference orientation (stylus on the outer groove); the `deg` rotation (from
+ * tonearmRotationDeg) sweeps it inward toward the label as the track plays, or
+ * parks it off the record when idle. The `.tonearm` CSS eases the motion.
+ *
+ * Coordinates match the geometry in lib/widget/spin.ts (pivot 88,13; arm len 56).
  */
-function Tonearm({ state }: { state: TonearmState }) {
+function Tonearm({ deg, parked, accent }: { deg: number; parked: boolean; accent: string }) {
   return (
     <svg
       className="tonearm"
       viewBox="0 0 100 100"
-      data-position={state}
       data-testid="tonearm"
+      data-parked={String(parked)}
+      style={{ transform: `rotate(${deg}deg)` }}
       aria-hidden
     >
-      {/* counterweight behind the pivot */}
-      <line x1="88" y1="11" x2="97" y2="5" stroke="#8a8a92" strokeWidth="1.6" strokeLinecap="round" />
+      {/* counterweight barrel behind the pivot */}
+      <line x1="88" y1="13" x2="88.3" y2="4" stroke="#8a8a92" strokeWidth="1.8" strokeLinecap="round" />
       <ellipse
-        cx="97"
-        cy="5"
-        rx="4"
-        ry="3"
-        fill="#2b2b30"
+        cx="88.3"
+        cy="4"
+        rx="6"
+        ry="4.5"
+        fill="#26262c"
         stroke="#55555f"
-        strokeWidth="0.6"
-        transform="rotate(-34 97 5)"
+        strokeWidth="0.7"
+        transform="rotate(91.7 88.3 4)"
       />
-      {/* main arm tube */}
-      <line
-        x1="88"
-        y1="11"
-        x2="70"
-        y2="28"
-        stroke="#c2c2ca"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-      />
-      {/* angled headshell */}
-      <g transform="rotate(24 70 28)">
-        <rect x="65.5" y="25" width="9" height="6" rx="1.2" fill="#3a3a42" stroke="#5a5a63" strokeWidth="0.6" />
+      {/* long thin arm tube */}
+      <line x1="88" y1="13" x2="86.7" y2="58" stroke="#cbcbd3" strokeWidth="1.5" strokeLinecap="round" />
+      {/* headshell + cartridge (cartridge in the accent colour) */}
+      <g transform="rotate(107.7 86.5 63)">
+        <rect x="83.5" y="57" width="6" height="12" rx="1.3" fill="#34343c" stroke="#5a5a63" strokeWidth="0.6" />
+        <rect x="84.5" y="65" width="4" height="4.5" rx="0.8" fill={accent} />
       </g>
       {/* stylus contact point */}
-      <circle cx="67" cy="31" r="1.3" fill="#0a0a0a" />
-      {/* gimbal pivot (rotationally symmetric so it stays put) */}
-      <circle cx="88" cy="11" r="5" fill="#26262c" stroke="#4a4a52" strokeWidth="1.2" />
-      <circle cx="88" cy="11" r="2" fill="#55555f" />
+      <circle cx="86.35" cy="69" r="1.2" fill="#111" />
+      {/* bulky gimbal pivot (rotationally symmetric so it stays put) */}
+      <circle cx="88" cy="13" r="7.5" fill="#202024" stroke="#4a4a52" strokeWidth="1.4" />
+      <circle cx="88" cy="13" r="3" fill="#55555f" />
     </svg>
   )
 }

@@ -2,7 +2,9 @@ import { describe, it, expect } from 'vitest'
 import {
   revDurationSec,
   spinStateFor,
-  tonearmStateFor,
+  tonearmRotationDeg,
+  progressFraction,
+  TONEARM_REST_DEG,
   shouldMarquee,
   interpolateProgress,
   formatTime,
@@ -21,11 +23,30 @@ describe('spin helpers', () => {
     expect(spinStateFor(false, true)).toBe('stopped')
   })
 
-  it('positions the tonearm like a real turntable', () => {
-    expect(tonearmStateFor(true, false)).toBe('playing') // track playing → on the record
-    expect(tonearmStateFor(false, false)).toBe('cued') // paused → lifted off the groove
-    expect(tonearmStateFor(false, true)).toBe('rest') // nothing playing → parked
-    expect(tonearmStateFor(true, true)).toBe('rest') // idle wins
+  it('parks the tonearm when idle and sweeps it inward with progress', () => {
+    // Idle → parked off the record.
+    expect(tonearmRotationDeg(true, 0.5)).toBe(TONEARM_REST_DEG)
+
+    const start = tonearmRotationDeg(false, 0)
+    const mid = tonearmRotationDeg(false, 0.5)
+    const end = tonearmRotationDeg(false, 1)
+
+    // 0% is the reference orientation (~0°), and the arm rotates monotonically inward.
+    expect(start).toBeCloseTo(0, 1)
+    expect(mid).toBeGreaterThan(start)
+    expect(end).toBeGreaterThan(mid)
+    // The rest (parked) angle is clearly outside the playing sweep.
+    expect(TONEARM_REST_DEG).toBeLessThan(start)
+    // Progress clamps to [0,1].
+    expect(tonearmRotationDeg(false, 2)).toBeCloseTo(end, 5)
+    expect(tonearmRotationDeg(false, -1)).toBeCloseTo(start, 5)
+  })
+
+  it('computes a clamped progress fraction', () => {
+    expect(progressFraction(0, 200000)).toBe(0)
+    expect(progressFraction(100000, 200000)).toBe(0.5)
+    expect(progressFraction(300000, 200000)).toBe(1)
+    expect(progressFraction(1000, 0)).toBe(0)
   })
 
   it('flags long titles for marquee', () => {
