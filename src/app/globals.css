@@ -330,12 +330,12 @@
     background: linear-gradient(180deg, #3c3c44, #26262c);
   }
   .ta__cart {
-    width: 0.042em;
-    height: 0.032em;
+    /* Elongated block so the cartridge reads as oriented along the arm. */
+    width: 0.03em;
+    height: 0.055em;
     border-radius: 0.006em;
     margin-top: 0.005em;
     background: var(--accent, #1db954);
-    transform: rotate(90deg);
   }
   .ta__sty {
     width: 0.011em;
