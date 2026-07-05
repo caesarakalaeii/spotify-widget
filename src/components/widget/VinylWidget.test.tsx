@@ -5,7 +5,7 @@ import { DEFAULT_SETTINGS, parseSettings } from '@/lib/settings/schema'
 import type { NowPlaying } from '@/types/nowplaying'
 
 function rotateDeg(el: HTMLElement): number {
-  const m = el.style.transform.match(/rotate\(([-\d.]+)deg\)/)
+  const m = el.style.getPropertyValue('--ta-rot').match(/(-?[\d.]+)deg/)
   return m ? parseFloat(m[1]!) : NaN
 }
 
@@ -32,7 +32,7 @@ describe('VinylWidget', () => {
     expect(screen.getByTestId('vinyl-disc')).toHaveAttribute('data-spin', 'spinning')
     const arm = screen.getByTestId('tonearm')
     expect(arm).toHaveAttribute('data-parked', 'false') // on the record
-    expect(arm.style.transform).toMatch(/rotate\(/)
+    expect(rotateDeg(arm)).toBeGreaterThanOrEqual(-61) // within the playing sweep, not parked (-72)
     expect(screen.getByText('Song Title')).toBeInTheDocument()
     expect(screen.getByTestId('spotify-attribution')).toHaveAttribute(
       'href',

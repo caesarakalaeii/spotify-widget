@@ -31,15 +31,16 @@ describe('spin helpers', () => {
     const mid = tonearmRotationDeg(false, 0.5)
     const end = tonearmRotationDeg(false, 1)
 
-    // 0% is the reference orientation (~0°), and the arm rotates monotonically inward.
-    expect(start).toBeCloseTo(0, 1)
+    // Outer groove → label: the arm rotates monotonically inward as progress grows.
+    expect(start).toBe(-61)
+    expect(end).toBe(-40)
     expect(mid).toBeGreaterThan(start)
     expect(end).toBeGreaterThan(mid)
-    // The rest (parked) angle is clearly outside the playing sweep.
+    // The rest (parked) angle is clearly outside the playing sweep (further out).
     expect(TONEARM_REST_DEG).toBeLessThan(start)
     // Progress clamps to [0,1].
-    expect(tonearmRotationDeg(false, 2)).toBeCloseTo(end, 5)
-    expect(tonearmRotationDeg(false, -1)).toBeCloseTo(start, 5)
+    expect(tonearmRotationDeg(false, 2)).toBe(end)
+    expect(tonearmRotationDeg(false, -1)).toBe(start)
   })
 
   it('computes a clamped progress fraction', () => {

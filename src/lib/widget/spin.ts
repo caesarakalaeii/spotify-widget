@@ -17,44 +17,23 @@ export function spinStateFor(isPlaying: boolean, reducedMotion: boolean): SpinSt
 }
 
 /**
- * Tonearm geometry (in the 0..100 SVG coordinate space of the disc box). The arm
- * pivots from a fixed base in the top-right corner; the stylus rides a circle of
- * radius ARM_LEN about that pivot. As the track progresses, the stylus tracks
- * inward from the outer groove (R_OUTER) toward the label (R_INNER), exactly like
- * a real record player. When nothing is playing the arm parks off the record.
+ * Tonearm rotation angles (degrees). The arm pivots from a fixed base off the
+ * top-right of the record; these angles were calibrated by measuring the rendered
+ * stylus position against the record radius (see the em-scaled deck layout in
+ * globals.css / VinylDisc): at START the stylus sits on the outer groove, at END
+ * it reaches the label, and at REST it is parked just off the record. Progress
+ * maps linearly across the sweep, so the stylus drifts inward as the track plays.
  */
-const TA_PIVOT = { x: 88, y: 13 }
-const TA_CENTER = { x: 50, y: 50 }
-const TA_ARM_LEN = 56 // long, slender arm (~56% of the record diameter)
-const TA_R_OUTER = 41 // stylus radius from centre at 0% progress (outer groove)
-const TA_R_INNER = 17 // stylus radius near the label at 100% progress
-
-/** Parked position (deg) when nothing is playing — swung off the record, to the right. */
-export const TONEARM_REST_DEG = -22
+export const TONEARM_REST_DEG = -72
+const TONEARM_START_DEG = -61 // 0% — outer groove
+const TONEARM_END_DEG = -40 // 100% — inner groove / label
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v))
 
-/** Rotation (radians) of the pivot→stylus vector placing the stylus at radius `r` from centre. */
-function tonearmPhiForRadius(r: number): number {
-  const dx = TA_PIVOT.x - TA_CENTER.x
-  const dy = TA_PIVOT.y - TA_CENTER.y
-  const K = (r * r - dx * dx - dy * dy - TA_ARM_LEN * TA_ARM_LEN) / (2 * TA_ARM_LEN)
-  const R = Math.hypot(dx, dy)
-  const psi = Math.atan2(dy, dx)
-  return psi + Math.acos(Math.max(-1, Math.min(1, K / R))) // right-side sweep branch
-}
-
-/** The SVG is drawn in this orientation (== 0% progress), so CSS rotation is relative to it. */
-export const TONEARM_REF_PHI = tonearmPhiForRadius(TA_R_OUTER)
-
-/**
- * CSS rotation (degrees) for the tonearm. Parked when idle; otherwise swept by
- * playback progress (0..1) so the stylus drifts from the outer groove to the label.
- */
+/** CSS rotation (degrees) for the tonearm: parked when idle, else swept by progress (0..1). */
 export function tonearmRotationDeg(idle: boolean, progress: number): number {
   if (idle) return TONEARM_REST_DEG
-  const r = TA_R_OUTER + (TA_R_INNER - TA_R_OUTER) * clamp01(progress)
-  return ((tonearmPhiForRadius(r) - TONEARM_REF_PHI) * 180) / Math.PI
+  return TONEARM_START_DEG + (TONEARM_END_DEG - TONEARM_START_DEG) * clamp01(progress)
 }
 
 /** Playback progress as a fraction 0..1 (0 when there is no track). */

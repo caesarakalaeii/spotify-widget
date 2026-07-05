@@ -117,7 +117,7 @@
     animation: none !important;
   }
   /* Snap the tonearm to position instead of sweeping. */
-  .tonearm {
+  .ta__arm {
     transition: none !important;
   }
 }
@@ -133,6 +133,21 @@
     width: var(--disc-size, 240px);
     height: var(--disc-size, 240px);
     flex: none;
+  }
+  /* Deck mode (tonearm on): a landscape "turntable" — the record sits left-of-centre
+     with room on the right for the arm. 1em == the record diameter, so every arm part
+     scales with --disc-size. Proportions calibrated against the reference. */
+  .vinyl[data-deck='true'] {
+    font-size: var(--disc-size, 240px);
+    width: 1.474em;
+    height: 1.158em;
+  }
+  .vinyl[data-deck='true'] .vinyl__disc {
+    inset: auto;
+    left: 0.079em;
+    top: 0.079em;
+    width: 1em;
+    height: 1em;
   }
 
   .vinyl__disc {
@@ -234,23 +249,98 @@
     z-index: 2;
   }
 
-  /* Tonearm: pivots from a fixed base in the top-right corner (off the platter).
-     Its rotation is set inline from playback progress (see tonearmRotationDeg):
-     parked off the record when idle, tracking inward as the track plays. The SVG
-     spans the whole disc box so its coordinates line up with the record. The eased
-     transition makes big swings (cue-in, track change, return-to-rest) feel
-     mechanical, while the slow per-second progress drift stays imperceptibly smooth. */
-  .tonearm {
+  /* Tonearm — a FIXED pivot assembly (post + cap) with only the arm rotating about
+     it, so the pivot never drifts. Sized in em (1em == record diameter). Rotation is
+     set inline from playback progress (tonearmRotationDeg): parked off the record when
+     idle, tracking from the outer groove to the label as the track plays. The eased
+     transition makes cue-in / track-change / return-to-rest feel mechanical, while the
+     slow per-second drift stays imperceptibly smooth. */
+  .ta__post {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-    transform-origin: 88% 13%; /* the pivot */
+    left: 1.289em;
+    top: 0.184em;
+    width: 0.116em;
+    height: 0.116em;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 32%, #40404a, #202024 60%, #0c0c10);
+    box-shadow: 0 0.016em 0.05em rgba(0, 0, 0, 0.7);
+    z-index: 4;
+  }
+  .ta__cap {
+    position: absolute;
+    left: 1.289em;
+    top: 0.184em;
+    width: 0.058em;
+    height: 0.058em;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 32%, #6a6a74, #34343c);
+    z-index: 6;
+  }
+  .ta__arm {
+    position: absolute;
+    left: 1.289em;
+    top: 0.184em;
+    width: 1.026em;
+    height: 0.042em;
+    transform-origin: 0.868em 50%; /* the pivot */
+    margin-left: -0.868em;
+    margin-top: -0.021em;
+    transform: rotate(var(--ta-rot, -72deg));
     transition: transform 0.9s cubic-bezier(0.25, 0.1, 0.25, 1);
-    z-index: 3;
+    z-index: 5;
     pointer-events: none;
-    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 0.011em 0.016em rgba(0, 0, 0, 0.5));
+  }
+  .ta__tube {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0.084em;
+    right: 0.179em;
+    height: 0.016em;
+    border-radius: 0.01em;
+    background: linear-gradient(180deg, #eee, #bdbdc6 40%, #7f7f88 60%, #c8c8d0);
+  }
+  .ta__cw {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    width: 0.105em;
+    height: 0.105em;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 32%, #3a3a42, #18181c);
+    box-shadow: 0 0.01em 0.03em rgba(0, 0, 0, 0.6);
+  }
+  .ta__head {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .ta__head-body {
+    width: 0.063em;
+    height: 0.047em;
+    border-radius: 0.01em;
+    background: linear-gradient(180deg, #3c3c44, #26262c);
+  }
+  .ta__cart {
+    width: 0.042em;
+    height: 0.032em;
+    border-radius: 0.006em;
+    margin-top: 0.005em;
+    background: var(--accent, #1db954);
+  }
+  .ta__sty {
+    width: 0.011em;
+    height: 0.026em;
+    margin-top: 0.005em;
+    background: #ddd;
   }
 
   .marquee {
