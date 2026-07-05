@@ -1,0 +1,50 @@
+{
+  "name": "spotify-widget",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Spotify now-playing vinyl widget for streamers (spotify.caes.ar)",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "migrate": "node scripts/migrate.mjs"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "jose": "^6.1.0",
+    "lucide-react": "^0.544.0",
+    "nanoid": "^5.1.6",
+    "next": "^16.2.9",
+    "pg": "^8.16.3",
+    "react": "^19.2.7",
+    "react-colorful": "^5.7.0",
+    "react-dom": "^19.2.7",
+    "tailwind-merge": "^3.6.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@playwright/test": "^1.56.1",
+    "@tailwindcss/postcss": "^4.3.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^24.7.2",
+    "@types/pg": "^8.15.5",
+    "@types/react": "^19.2.16",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "^16.2.9",
+    "jsdom": "^27.0.1",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

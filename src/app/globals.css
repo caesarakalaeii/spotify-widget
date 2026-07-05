@@ -1,0 +1,282 @@
+@import 'tailwindcss';
+
+/* Cascade layer order — declared before any @layer body. */
+@layer base, components;
+
+/* Font bridge — maps next/font/google CSS variables to Tailwind font utilities. */
+@theme inline {
+  --font-sans: var(--font-barlow);
+  --font-mono: var(--font-dm-mono);
+}
+
+/* ============================================================
+   DESIGN TOKENS — dark-only, ported from all-chat's system so
+   spotify.caes.ar shares the same visual language.
+   ============================================================ */
+@theme {
+  /* Brand */
+  --color-spotify: #1db954;
+  --color-spotify-bright: #1ed760;
+
+  /* Neutral scale — oklch, constant chroma ~0.007, hue 270 */
+  --color-neutral-950: oklch(0.09 0.007 270); /* bg */
+  --color-neutral-900: oklch(0.11 0.009 270); /* surface */
+  --color-neutral-800: oklch(0.14 0.008 270); /* surface-2 */
+  --color-neutral-700: oklch(0.22 0.007 270); /* elevated border */
+  --color-neutral-600: oklch(0.35 0.007 270); /* muted text */
+  --color-neutral-400: oklch(0.58 0.007 270); /* secondary text */
+  --color-neutral-200: oklch(0.78 0.005 270); /* tertiary text */
+  --color-neutral-100: oklch(0.91 0.003 270); /* primary text */
+
+  /* Semantic */
+  --color-bg: var(--color-neutral-950);
+  --color-surface: var(--color-neutral-900);
+  --color-surface-2: var(--color-neutral-800);
+  --color-border: oklch(from var(--color-neutral-100) l c h / 0.06);
+  --color-border-md: oklch(from var(--color-neutral-100) l c h / 0.1);
+  --color-text: var(--color-neutral-100);
+  --color-text-sub: var(--color-neutral-400);
+  --color-text-dim: var(--color-neutral-600);
+
+  /* Component */
+  --color-badge-bg: oklch(from var(--color-neutral-100) l c h / 0.07);
+  --shadow-glow-spotify: 0 0 20px color-mix(in oklch, var(--color-spotify) 40%, transparent);
+
+  /* Typography */
+  --text-xs: 0.6875rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.875rem;
+  --text-lg: 1rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+}
+
+/* ============================================================
+   BASE LAYER
+   ============================================================ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  html {
+    font-family: var(--font-sans);
+    background: var(--color-bg);
+    color: var(--color-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    background-color: var(--color-bg);
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.013) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.013) 1px, transparent 1px);
+    background-size: 40px 40px;
+    color: var(--color-text);
+    min-height: 100vh;
+  }
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+}
+
+/* ============================================================
+   WIDGET ANIMATIONS
+   Keyframes are registered at document scope: animation names are
+   globally scoped regardless of @layer context.
+   ============================================================ */
+@keyframes vinyl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes vinyl-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vinyl__disc,
+  .marquee__track {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   VINYL WIDGET — the record-player visuals. Driven by CSS custom
+   properties set inline from settings: --disc-size, --rev-duration,
+   --groove-alpha, --accent, --marquee-dur.
+   ============================================================ */
+@layer components {
+  .vinyl {
+    position: relative;
+    width: var(--disc-size, 240px);
+    height: var(--disc-size, 240px);
+    flex: none;
+  }
+
+  .vinyl__disc {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-full);
+    will-change: transform;
+    background:
+      repeating-radial-gradient(
+        circle at center,
+        rgba(0, 0, 0, 0) 0 2px,
+        rgba(255, 255, 255, calc(var(--groove-alpha, 0.6) * 0.06)) 2px 3px
+      ),
+      radial-gradient(circle at center, #1a1a1a 0%, #050505 62%, #000 100%);
+    box-shadow:
+      0 6px 24px rgba(0, 0, 0, 0.5),
+      inset 0 0 40px rgba(0, 0, 0, 0.6);
+  }
+  /* Rotating top sheen (optional). */
+  .vinyl__disc[data-sheen='true'] {
+    background:
+      conic-gradient(
+        from 0deg,
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0) 25%,
+        rgba(255, 255, 255, 0.06) 50%,
+        rgba(255, 255, 255, 0) 75%,
+        rgba(255, 255, 255, 0.1)
+      ),
+      repeating-radial-gradient(
+        circle at center,
+        rgba(0, 0, 0, 0) 0 2px,
+        rgba(255, 255, 255, calc(var(--groove-alpha, 0.6) * 0.06)) 2px 3px
+      ),
+      radial-gradient(circle at center, #1a1a1a 0%, #050505 62%, #000 100%);
+  }
+  .vinyl__disc[data-glow='true'] {
+    box-shadow:
+      0 6px 24px rgba(0, 0, 0, 0.5),
+      inset 0 0 40px rgba(0, 0, 0, 0.6),
+      0 0 26px color-mix(in oklch, var(--accent, #1db954) 40%, transparent);
+  }
+  .vinyl__disc[data-spin='spinning'] {
+    animation: vinyl-spin var(--rev-duration, 1.8s) linear infinite;
+  }
+  .vinyl__disc[data-spin='spinning-down'] {
+    animation: vinyl-spin calc(var(--rev-duration, 1.8s) * 4) cubic-bezier(0.2, 0.8, 0.2, 1) 1
+      forwards;
+  }
+  .vinyl__disc[data-spin='stopped'] {
+    animation: none;
+  }
+
+  .vinyl__art {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    object-fit: cover;
+    z-index: 1;
+  }
+  .vinyl__art--label {
+    width: 38%;
+    height: 38%;
+    border-radius: var(--radius-full);
+    box-shadow:
+      0 0 0 2px rgba(0, 0, 0, 0.6),
+      0 0 0 6px rgba(255, 255, 255, 0.05);
+  }
+  .vinyl__art--full {
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-full);
+  }
+  .vinyl__art--square {
+    width: 40%;
+    height: 40%;
+    border-radius: var(--radius-md);
+  }
+  .vinyl__label-fallback {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 38%;
+    height: 38%;
+    border-radius: var(--radius-full);
+    background: radial-gradient(circle, #2a2a30, #141418);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.6);
+    z-index: 1;
+  }
+  .vinyl__spindle {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 3.5%;
+    height: 3.5%;
+    border-radius: var(--radius-full);
+    background: radial-gradient(circle, #444, #000);
+    box-shadow: inset 0 0 3px #000;
+    z-index: 2;
+  }
+
+  .tonearm {
+    position: absolute;
+    top: -3%;
+    right: 1%;
+    width: 46%;
+    height: 46%;
+    transform-origin: 86% 14%;
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: 3;
+    pointer-events: none;
+  }
+  .tonearm[data-engaged='true'] {
+    transform: rotate(22deg);
+  }
+  .tonearm[data-engaged='false'] {
+    transform: rotate(-10deg);
+  }
+
+  .marquee {
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+  .marquee[data-active='false'] .marquee__track {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .marquee[data-active='true'] .marquee__track {
+    display: inline-flex;
+    gap: 2rem;
+    animation: vinyl-marquee var(--marquee-dur, 12s) linear infinite;
+  }
+}
+
+/* Checkerboard used behind the dashboard live preview to convey transparency. */
+.transparency-grid {
+  background-color: #1a1a1e;
+  background-image:
+    linear-gradient(45deg, #26262c 25%, transparent 25%),
+    linear-gradient(-45deg, #26262c 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #26262c 75%),
+    linear-gradient(-45deg, transparent 75%, #26262c 75%);
+  background-size: 20px 20px;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0px;
+}
