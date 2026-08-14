@@ -28,3 +28,8 @@ next-env.d.ts
 *.pem
 npm-debug.log*
 *.tsbuildinfo
+
+# nix (flake.nix / flake.lock are tracked; these are local artefacts)
+result
+result-*
+.direnv/
